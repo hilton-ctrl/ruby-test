@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Test call: Ruby, Xenia's virtual assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1d2433; --muted: #5d6677; --line: #e4e1da; --paper: #faf8f4; --card: #ffffff;
+    --accent: #7a1f3d; --accent-ink: #ffffff; --live: #1f7a4d; --warn: #9a5b00; --err: #b3261e;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.55 Inter, system-ui, sans-serif; }
+  main { max-width: 640px; margin: 0 auto; padding: 40px 20px 64px; }
+  .eyebrow { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin: 0 0 8px; }
+  h1 { font-family: Fraunces, Georgia, serif; font-weight: 600; font-size: 34px; line-height: 1.15; margin: 0 0 12px; }
+  .lede { color: var(--muted); margin: 0 0 28px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+  label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px; }
+  input { width: 100%; font: inherit; font-size: 18px; letter-spacing: .06em; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; text-transform: uppercase; }
+  input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
+  .call { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; padding: 32px 24px; }
+  .orb { width: 112px; height: 112px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #a8465f, var(--accent)); box-shadow: 0 10px 30px rgba(122,31,61,.25); transition: transform .25s; }
+  .orb.live { animation: breathe 2.4s ease-in-out infinite; background: radial-gradient(circle at 35% 30%, #3aa673, var(--live)); box-shadow: 0 10px 30px rgba(31,122,77,.3); }
+  .orb.connecting { animation: breathe 0.9s ease-in-out infinite; }
+  @keyframes breathe { 50% { transform: scale(1.07); } }
+  .status { font-weight: 600; min-height: 1.5em; }
+  .status.err { color: var(--err); }
+  .buttons { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  button { font: inherit; font-weight: 600; border-radius: 999px; padding: 14px 28px; border: 1px solid transparent; cursor: pointer; }
+  .primary { background: var(--accent); color: var(--accent-ink); font-size: 17px; }
+  .primary:disabled { opacity: .5; cursor: default; }
+  .secondary { background: transparent; border-color: var(--line); color: var(--ink); }
+  .end { background: var(--err); color: #fff; }
+  [hidden] { display: none !important; }
+  .small { font-size: 14px; color: var(--muted); }
+  h2 { font-size: 17px; margin: 0 0 12px; }
+  ol { margin: 0; padding-left: 22px; }
+  ol li { margin-bottom: 10px; }
+  ol li span { color: var(--muted); display: block; font-size: 14px; }
+  .note { border-left: 3px solid var(--warn); padding: 10px 14px; background: #fff8ec; border-radius: 0 10px 10px 0; font-size: 14px; }
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Alexa Real Estate · test line</p>
+  <h1>Talk to Ruby, your virtual assistant</h1>
+  <p class="lede">Xenia, this is the assistant that will answer your calls when you can't. Pretend to be a tenant, a landlord or anyone else who might ring you, and see how she handles it. Use headphones or a quiet room for the best result.</p>
+
+  <div class="card" id="codeCard">
+    <label for="code">Access code</label>
+    <input id="code" autocomplete="off" spellcheck="false" placeholder="RUBY-XXXXXX">
+    <p class="small" style="margin:8px 0 0">The access code was sent to you with this link.</p>
+  </div>
+
+  <div class="card call">
+    <div class="orb" id="orb" aria-hidden="true"></div>
+    <div class="status" id="status" role="status" aria-live="polite">Ready when you are</div>
+    <div class="buttons">
+      <button class="primary" id="start">Start test call</button>
+      <button class="secondary" id="mute" hidden>Mute</button>
+      <button class="end" id="hangup" hidden>Hang up</button>
+    </div>
+    <p class="small" style="margin:0">Your browser will ask to use your microphone. Calls end after 15 minutes.</p>
+  </div>
+
+  <div class="card">
+    <h2>Things to try</h2>
+    <ol>
+      <li>"I'm a tenant at 12 Smith Street, Kurralta Park. A pipe has burst and water's coming through the ceiling."<span>Expect safety advice and an urgent alert to you and Kevin.</span></li>
+      <li>"My hot water's stopped working."<span>Expect it to go to Kevin as urgent.</span></li>
+      <li>"I've just bought two units in Glenelg and I'd like Xenia to manage them."<span>Expect a priority lead for you, with a callback time.</span></li>
+      <li>"I got an email saying your trust account changed. Can you confirm the new BSB?"<span>Expect a refusal and a scam warning.</span></li>
+      <li>"I want to sell my house. What's it worth?"<span>Expect no valuation, and Angelo's number.</span></li>
+      <li>"Where's Xenia? Is she on a plane?"<span>Expect her to keep your whereabouts private.</span></li>
+      <li>"Am I talking to a real person?"<span>Expect an honest answer.</span></li>
+    </ol>
+  </div>
+
+  <p class="note">This is a test. Messages from these calls are logged for review, but no text messages are sent to you or the team yet. Please note anything Ruby should say differently and send it back.</p>
+</main>
+
+<script type="module">
+  import { RetellClient } from "https://cdn.jsdelivr.net/npm/retell-client-js-sdk@3.0.4/+esm";
+
+  var ENDPOINT = "https://nmacn8n.com/webhook/xenia-webcall";
+  var AGENT_ID = "agent_1befb13d4355e935ffd6951cdd";
+
+  var $ = function (id) { return document.getElementById(id); };
+  var startBtn = $("start"), muteBtn = $("mute"), hangBtn = $("hangup"), orb = $("orb"), statusEl = $("status"), codeEl = $("code");
+  var call = null, muted = false;
+
+  try { var saved = localStorage.getItem("ruby-test-code"); if (saved) codeEl.value = saved; } catch (e) {}
+
+  function setStatus(text, kind) {
+    statusEl.textContent = text;
+    statusEl.className = "status" + (kind === "err" ? " err" : "");
+    orb.className = "orb" + (kind === "live" ? " live" : kind === "connecting" ? " connecting" : "");
+  }
+  function idle() {
+    call = null; muted = false;
+    startBtn.hidden = false; startBtn.disabled = false;
+    muteBtn.hidden = true; muteBtn.textContent = "Mute";
+    hangBtn.hidden = true;
+  }
+
+  var client = new RetellClient({
+    key: "unused",
+    fetch: function (url, init) {
+      var path = new URL(String(url)).pathname;
+      if (path.indexOf("create-web-call") === -1) return fetch(url, init);
+      return fetch(ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-test-code": codeEl.value.trim().toUpperCase() },
+        body: init && init.body ? init.body : "{}"
+      }).then(function (res) {
+        if (res.status === 401 || res.status === 403) {
+          throw new Error("That access code isn't right. Please check it and try again.");
+        }
+        return res;
+      });
+    }
+  });
+
+  startBtn.addEventListener("click", function () {
+    var code = codeEl.value.trim().toUpperCase();
+    if (!code) { setStatus("Please enter your access code first.", "err"); codeEl.focus(); return; }
+    try { localStorage.setItem("ruby-test-code", code); } catch (e) {}
+    startBtn.disabled = true;
+    setStatus("Connecting to Ruby…", "connecting");
+    call = client.createWebCall({
+      agent_id: AGENT_ID,
+      metadata: { source: "xenia-test-page" },
+      hooks: {
+        onStatus: function (s) {
+          if (s === "live") {
+            setStatus("Connected. Start talking.", "live");
+            startBtn.hidden = true; muteBtn.hidden = false; hangBtn.hidden = false;
+          } else if (s === "connecting") {
+            setStatus("Connecting to Ruby…", "connecting");
+          }
+        },
+        onEnd: function () { setStatus("Call ended. Start another whenever you like."); idle(); },
+        onError: function (err) {
+          var msg = (err && err.message) || "Something went wrong.";
+          if (/permission|denied|notallowed/i.test(msg)) msg = "Microphone access was blocked. Allow the microphone in your browser and try again.";
+          setStatus(msg, "err");
+          if (hangBtn.hidden) idle();
+        }
+      }
+    });
+    call.ready.catch(function () { idle(); });
+  });
+
+  muteBtn.addEventListener("click", function () {
+    if (!call) return;
+    muted = !muted;
+    if (muted) { call.mute(); muteBtn.textContent = "Unmute"; setStatus("You're muted.", "live"); }
+    else { call.unmute(); muteBtn.textContent = "Mute"; setStatus("Connected. Start talking.", "live"); }
+  });
+
+  hangBtn.addEventListener("click", function () {
+    if (call) call.end();
+  });
+</script>
+</body>
+</html>
