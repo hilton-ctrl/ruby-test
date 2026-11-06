@@ -91,7 +91,7 @@
 
   var $ = function (id) { return document.getElementById(id); };
   var startBtn = $("start"), muteBtn = $("mute"), hangBtn = $("hangup"), orb = $("orb"), statusEl = $("status"), codeEl = $("code");
-  var call = null, muted = false;
+  var call = null, muted = false, hadError = false;
 
   try { var saved = localStorage.getItem("ruby-test-code"); if (saved) codeEl.value = saved; } catch (e) {}
 
@@ -118,6 +118,8 @@
         body: init && init.body ? init.body : "{}"
       }).then(function (res) {
         if (res.status === 401 || res.status === 403) {
+          hadError = true;
+          setStatus("That access code isn't right. Please check it and try again.", "err");
           throw new Error("That access code isn't right. Please check it and try again.");
         }
         return res;
@@ -130,6 +132,7 @@
     if (!code) { setStatus("Please enter your access code first.", "err"); codeEl.focus(); return; }
     try { localStorage.setItem("ruby-test-code", code); } catch (e) {}
     startBtn.disabled = true;
+    hadError = false;
     setStatus("Connecting to Ruby…", "connecting");
     call = client.createWebCall({
       agent_id: AGENT_ID,
@@ -143,9 +146,11 @@
             setStatus("Connecting to Ruby…", "connecting");
           }
         },
-        onEnd: function () { setStatus("Call ended. Start another whenever you like."); idle(); },
+        onEnd: function () { if (!hadError) setStatus("Call ended. Start another whenever you like."); idle(); },
         onError: function (err) {
+          hadError = true;
           var msg = (err && err.message) || "Something went wrong.";
+          if (/access code/i.test(msg) === false && /401|403|unauthori|invalid access/i.test(msg)) msg = "That access code isn't right. Please check it and try again.";
           if (/permission|denied|notallowed/i.test(msg)) msg = "Microphone access was blocked. Allow the microphone in your browser and try again.";
           setStatus(msg, "err");
           if (hangBtn.hidden) idle();
